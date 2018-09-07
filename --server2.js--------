@@ -1,0 +1,70 @@
+var http = require('http');
+var fs = require('fs');
+
+const bodyParser= require('body-parser');
+const express = require('express');
+const app = express()
+
+/* const MongoClient = require('mongodb').MongoClient
+
+ 
+MongoClient.connect('mongodb://crudusername:mahara263645@ds245512.mlab.com:45512/crud_node_db', { useNewUrlParser: true }, (err, database) => {
+	if (err) return console.log(err)
+		db = database.db('crud_node_db') // whatever your database name is
+	app.listen(3000, () => {
+		console.log('listening on 3000')
+	})
+}) */
+
+
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+ 
+// Connection URL
+const url = 'mongodb://localhost:27017/bench';
+ 
+// Database Name
+const dbName = 'command-monitoring-tests';
+ 
+// Use connect method to connect to the server
+MongoClient.connect('mongodb://localhost:27017/bench2', function(err, client) {
+  assert.equal(null, err);
+  console.log("Connected successfully to server");
+ 
+  const db = client.db(dbName);
+ 
+  client.close();
+});
+
+
+app.use(bodyParser.urlencoded({extended: true}))
+
+/* app.get("/ajaxcall", function(req, res) {
+	var respondWith = "TADA Country";
+	return res.end(respondWith);
+});
+
+app.get("", function(req, res) {
+	fs.readFile('index.html',function (err, data){
+        res.writeHead(200, {'Content-Type': 'text/html','Content-Length':data.length});
+        res.write(data);
+        res.end();
+    });	
+}); */
+
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html')
+  // Note: __dirname is directory that contains the JavaScript source code. Try logging it and see what you get!
+  // Mine was '/Users/zellwk/Projects/demo-repos/crud-express-mongo' for this app.
+})
+
+app.post('/quotes', (req, res) => {
+	console.log('post request');
+	db.collection('quotes').insertOne(req.body, (err, result) => {
+		if (err) return console.log(err)
+			console.log('saved to database')
+		res.redirect('/')
+	})
+})
+
+//app.listen(3000);
